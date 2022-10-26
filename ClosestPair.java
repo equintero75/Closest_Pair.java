@@ -23,9 +23,10 @@ public class ClosestPair {
         // TODO code application logic here
         int n;
         n = 21; // Numero de puntos
-        int[][] coord = new int[n][2]; // matriz principal con
+        int[][] coord = new int[n][2]; // matriz principal con n puntos
         Random rand = new Random();
         double save = 99999;
+        // Crea n coordenadas
         for (int i = 0; i < n; ++i) {
             coord[i][0] = Math.abs((100) + rand.nextInt(100));
             coord[i][1] = Math.abs((50) + rand.nextInt(50));

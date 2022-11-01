@@ -12,7 +12,7 @@ import java.util.Random;
  * Codigo Estudiantil: 200158282
  * Workshop Closest Pair
  * 07-09-2022
- * Realizar un algoritmo que cuente la cantidad de duplicados que hay en un texto
+ * Realizar un algoritmo que mida la menor distancia de un grupo de puntos
  */
 public class ClosestPair {
 
@@ -21,17 +21,96 @@ public class ClosestPair {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        int n;
-        n = 21; // Numero de puntos
-        int[][] coord = new int[n][2]; // matriz principal con n puntos
-        Random rand = new Random();
-        double save = 99999;
-        // Crea n coordenadas
-        for (int i = 0; i < n; ++i) {
-            coord[i][0] = Math.abs((100) + rand.nextInt(100));
-            coord[i][1] = Math.abs((50) + rand.nextInt(50));
+        int n; // Numero de puntos
+        int inp; // Numero de inputs
+        inp = 0;
+        long time, time2, totalt; // Tiempo de ejecución
+        int comparisons; // Numero de comparaciones
+        for (n = 11; n < 3000; n = n + 10) {
+            inp++;
+            comparisons = 0;
+            time = 0;
+            time2 = 0;
+            totalt = 0;
+            int[][] coord = new int[n][2]; // matriz principal con n+1 puntos
+            Random rand = new Random();
+            double mindist;
+            mindist = Double.POSITIVE_INFINITY;
+            for (int i = 0; i < n; ++i) {
+                coord[i][0] = rand.nextInt(n) + rand.nextInt(n); // para mas variabilidad en los numeros toma valores de 0 a 2n
+                coord[i][1] = rand.nextInt(4);
+            }
+            Sort(coord, n);
+            // toma la mitad de los n puntos
+            int mid = (n - 1) / 2;
+            // distancia de el punto medio
+            int dis;
+            dis = coord[mid][0];
+            // imprime las coordenadas en orden respecto a x
+            /*for (int i = 0; i < n; i++) {
+                System.out.println(coord[i][0] + " " + coord[i][1]);
+            }*/
+            time = System.nanoTime();
+            double dis1 = Bruteforce(coord, 0, mid, comparisons);
+            double dis2 = Bruteforce(coord, mid, n, comparisons);
+            time = System.nanoTime() - time;
+            // valor a sumar y restar al punto medio
+            double add;
+            //Toma la distancia mas corta
+            if (dis1 < dis2) {
+                add = dis1;
+            } else {
+                add = dis2;
+            }
+            boolean found;
+            found = false;
+            //Le resta la distancia mas corta al punto medio
+            int liminf = 0;
+            for (int i = 0; found != true; i++) {
+                if (coord[i][0] >= (dis - add)) {
+                    liminf = i;
+                    found = true;
+                }
+            }
+            found = false;
+            //Le suma la distancia mas corta al punto medio
+            int limsup = 0;
+            for (int i = 0; found != true; i++) {
+                if (coord[i][0] > (dis + add)) {
+                    found = true;
+                    limsup = i;
+                }
+            }
+            time2 = System.nanoTime();
+            double dis3 = Bruteforce(coord, liminf, limsup, comparisons);
+            time2 = System.nanoTime() - time2;
+            totalt = time + time2;
+            if (add < dis3) {
+                // System.out.println("La distancia minima es: " + add);
+            } else {
+                // System.out.println("La distancia minima es: " + dis3);
+            }
+            System.out.println(inp + " " + comparisons + " " + totalt);
+            // Algoritmo de fuerza bruta
+            for (int i = 0; i < n - 1; ++i) {
+                int x1 = coord[i][0];
+                int y1 = coord[i][1];
+                for (int j = i + 1; j < n; ++j) {
+                    int x2 = coord[j][0];
+                    int y2 = coord[j][1];
+                    double dist = ((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1));
+                    if (mindist > dist) {
+                        mindist = dist;
+                    }
+                }
+            }
+            mindist = Math.sqrt(mindist);
+            // System.out.println("La distancia minima es: " + mindist);
         }
-        // Metodo de ordenamiento
+    }
+
+    // Metodo de ordenamiento
+    public static void Sort(int[][] coord, int n) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n - 1; j++) {
                 if (coord[j][0] > coord[j + 1][0]) {
@@ -44,97 +123,28 @@ public class ClosestPair {
                 }
             }
         }
-        // toma la mitad de los n puntos
-        int mid = (n - 1) / 2;
-        // distancia de el punto medio
-        int dis;
-        dis = coord[mid][0];
-        // imprime las coordenadas en orden respecto a x
-        for (int i = 0; i < n; i++) {
-            System.out.println(coord[i][0] + " " + coord[i][1]);
-        }
-        double dis1 = Bruteforce(coord, 0, mid);
-        double dis2 = Bruteforce(coord, mid, n);
-        double add;
-        //Toma la distancia mas corta
-        if (dis1 < dis2) {
-            add = dis1;
-        } else {
-            add = dis2;
-        }
-        boolean found;
-        found = false;
-        //Le resta la distancia mas corta al punto medio
-        int liminf = 0;
-        for (int i = 0; found != true; i++) {
-            if (coord[i][0] >= (dis - add)) {
-                liminf = i;
-                found = true;
-            }
-        }
-        found = false;
-        //Le suma la distancia mas corta al punto medio
-        int limsup = 0;
-        for (int i = 0; found != true; i++) {
-            if (coord[i][0] > (dis + add)) {
-                found = true;
-                limsup = i;
-            }
-        }
-        System.out.println(dis1);
-        System.out.println(dis2);
-        double dis3 = Bruteforce(coord, liminf, limsup);
-        System.out.println(dis3);
-        if (add < dis3){
-            System.out.println("La distancia minima es: "+add);
-        } else {
-            System.out.println("La distancia minima es: "+dis3);
-        }
-        /*coord[0][0] = 10;
-        coord[0][1] = 5;
-        coord[1][0] = 13;
-        coord[1][1] = 9;
-        coord[2][0] = 15;
-        coord[2][1] = 5;
-        coord[3][0] = 16;
-        coord[3][1] = 7;
-        coord[4][0] = 18;
-        coord[4][1] = 10;
-        coord[5][0] = 22;
-        coord[5][1] = 7;
-         */
-        // Algoritmo de fuerza bruta
-        for (int i = 0; i < n - 1; ++i) {
-            int x1 = coord[i][0];
-            int y1 = coord[i][1];
-            for (int j = i + 1; j < n; ++j) {
-                int x2 = coord[j][0];
-                int y2 = coord[j][1];
-                double dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-                if (save > dist) {
-                    save = dist;
-                }
-            }
-        }
-
-        System.out.println("La distancia minima es: " + save);
     }
 
-    public static double Bruteforce(int[][] coord, int x, int n) {
-        double save = 9999;
+    // 
+    public static double Bruteforce(int[][] coord, int x, int n, int comp) {
+        double mindist;
+        mindist = Double.POSITIVE_INFINITY;
         for (int i = x; i < n; i++) {
+            comp = comp + 1;
             int x1 = coord[i][0];
             int y1 = coord[i][1];
             for (int j = i + 1; j < n; ++j) {
+                comp = comp + 1;
                 int x2 = coord[j][0];
                 int y2 = coord[j][1];
-                double dist = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-                if (save > dist) {
-                    save = dist;
+                double dist = ((x2 - x1) * (x2 - x1)) + ((y2 - y1) * (y2 - y1));
+                if (mindist > dist) {
+                    comp = comp + 1;
+                    mindist = dist;
                 }
             }
         }
-        return save;
+        mindist = Math.sqrt(mindist);
+        return mindist;
     }
-
 }
